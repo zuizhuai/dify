@@ -2,7 +2,7 @@ import json
 import os
 import time
 from collections.abc import Callable
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import cast
 from unittest.mock import MagicMock, call, create_autospec
@@ -217,7 +217,8 @@ class TestTimestampFieldsUseUtc:
             assert OptionalTimestampField().format(NAIVE_UTC) == NAIVE_UTC_EPOCH
             assert to_timestamp(NAIVE_UTC) == NAIVE_UTC_EPOCH
             # Aware values keep their own offset instead of being reinterpreted.
-            assert to_timestamp(datetime(2026, 10, 16, 16, 0, 0, tzinfo=UTC)) == NAIVE_UTC_EPOCH
+            cst = timezone(timedelta(hours=8))
+            assert to_timestamp(datetime(2026, 10, 16, 16, 0, 0, tzinfo=cst)) == NAIVE_UTC_EPOCH
             assert to_timestamp(None) is None
             assert to_timestamp(NAIVE_UTC_EPOCH) == NAIVE_UTC_EPOCH
         finally:
