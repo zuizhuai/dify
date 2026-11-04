@@ -102,6 +102,7 @@ from graphon.nodes.human_input.entities import HumanInputNodeData as GraphonHuma
 from graphon.nodes.human_input.human_input_node import HumanInputNode
 from graphon.runtime import RuntimeState, VariablePool
 from graphon.runtime.execution import ROOT_FRAME_ID
+from graphon.variable_loader import DUMMY_VARIABLE_LOADER
 from graphon.variables.variables import StringVariable
 from models import Account, UploadFile
 from models.enums import CreatorUserRole, WorkflowRunTriggeredFrom
@@ -1361,14 +1362,14 @@ class TestWorkflowAppRunnerSingleNodeCases:
             type=ModelWorkflowType.WORKFLOW,
             version="v1",
             graph=json.dumps({"nodes": [], "edges": []}),
-            kind=WorkflowKind.WORKFLOW,
+            kind=WorkflowKind.SNIPPET,
         )
         workflow.environment_variables = []
 
         runner = WorkflowAppRunner(
             application_generate_entity=app_generate_entity,
             queue_manager=queue_manager,
-            variable_loader=MagicMock(),
+            variable_loader=DUMMY_VARIABLE_LOADER,
             workflow=workflow,
             system_user_id="system-user",
         )
@@ -1392,7 +1393,7 @@ class TestWorkflowAppRunnerSingleNodeCases:
                 patch("core.app.apps.workflow.app_runner.get_default_root_node_id", return_value="root-node"),
                 patch("core.app.apps.workflow.app_runner.get_compatible_start_aliases", return_value=()),
                 patch("core.app.apps.workflow.app_runner.add_node_inputs_to_pool"),
-                patch.object(runner, "_init_graph", return_value=MagicMock()),
+                patch.object(runner, "_init_graph", return_value=None),
             ):
                 runner.prepare()
         finally:
